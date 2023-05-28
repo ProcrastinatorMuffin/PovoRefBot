@@ -34,3 +34,8 @@ def delete_code(id: int):
 def increment_code_usage(id: int):
     cursor.execute('UPDATE codes SET usage_count = usage_count + 1 WHERE id = ?', (id,))
     conn.commit()
+
+
+def code_exists(code: str):
+    cursor.execute('SELECT * FROM codes WHERE code = ?', (code,))
+    return cursor.fetchone() is not None
