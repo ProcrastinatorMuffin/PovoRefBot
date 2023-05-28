@@ -14,14 +14,8 @@ CODE_REGEX = r'^[a-zA-Z0-9]+$'  # Only allows alphanumeric characters
 # Handler for /start command
 @dp.message_handler(commands=['start'])
 async def start_command(message: types.Message):
-    await message.answer("Welcome! Please send your Povo referral code. Remember, the code should contain only "
-                         "Latin letters and Arabic numerals.")
-
-
-# Handler for /stop command
-@dp.message_handler(commands=['stop'])
-async def stop_command(message: types.Message):
-    await message.answer("Stopping bot...")
+    await message.answer(
+        "Welcome! To send your Povo referral code, use the /povo_add command followed by your code. Remember, the code should contain only Latin letters and Arabic numerals.")
 
 
 # Handler for /povo_add command
@@ -30,16 +24,6 @@ async def add_referral_code_command(message: types.Message):
     referral_code = message.get_args()
     if re.match(CODE_REGEX, referral_code):
         add_code(referral_code)
-        await message.answer("Referral code added successfully!")
-    else:
-        await message.answer("Invalid referral code. The code should contain only Latin letters and Arabic numerals.")
-
-
-# Handler for private chat referral code submission
-@dp.message_handler(content_types=types.ContentType.TEXT, chat_type=types.ChatType.PRIVATE)
-async def add_referral_code(message: types.Message):
-    if re.match(CODE_REGEX, message.text):
-        add_code(message.text)
         await message.answer("Referral code added successfully!")
     else:
         await message.answer("Invalid referral code. The code should contain only Latin letters and Arabic numerals.")
