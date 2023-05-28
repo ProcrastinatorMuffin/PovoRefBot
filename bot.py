@@ -2,7 +2,7 @@ import re
 from aiogram import Bot, Dispatcher, types
 from random import choice
 from config import API_TOKEN
-from database import add_code, get_codes, delete_code, increment_code_usage
+from database import add_code, get_codes, delete_code, increment_code_usage, code_exists
 
 # Initialize bot and dispatcher
 bot = Bot(token=API_TOKEN)
@@ -23,8 +23,11 @@ async def start_command(message: types.Message):
 async def add_referral_code_command(message: types.Message):
     referral_code = message.get_args()
     if re.match(CODE_REGEX, referral_code):
-        add_code(referral_code)
-        await message.answer("Referral code added successfully!")
+        if code_exists(referral_code):
+            await message.reply("This referral code already exists. If you continue to duplicate your code, you may be suspended from using this bot.")
+        else:
+            add_code(referral_code)
+            await message.answer("Referral code added successfully!")
     else:
         await message.answer("Invalid referral code. The code should contain only Latin letters and Arabic numerals.")
 
