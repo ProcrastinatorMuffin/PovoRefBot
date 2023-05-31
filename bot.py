@@ -32,6 +32,18 @@ async def add_referral_code_command(message: types.Message):
         await message.answer("Invalid referral code. The code should contain only Latin letters and Arabic numerals.")
 
 
+# Handler for /povo_del command
+@dp.message_handler(commands=['povo_del'])
+async def delete_referral_code_command(message: types.Message):
+    referral_code = message.get_args()
+    codes = [c[1] for c in get_codes()]
+    if referral_code in codes:
+        delete_code(referral_code)
+        await message.answer("Referral code deleted successfully!")
+    else:
+        await message.answer("Referral code not found.")
+
+
 # Handler for /povo command
 @dp.message_handler(commands=['povo'])
 async def send_referral_code(message: types.Message):
