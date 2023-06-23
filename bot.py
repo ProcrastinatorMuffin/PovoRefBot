@@ -27,9 +27,13 @@ async def add_referral_code_command(message: types.Message):
             await message.reply("This referral code already exists. If you continue to duplicate your code, you may be suspended from using this bot.")
         else:
             add_code(referral_code)
-            await message.answer("Referral code added successfully!")
+            await message.reply("Referral code added successfully!")
+
+            # Delete the user's message
+            if message.chat.type == 'supergroup' or message.chat.type == 'group':
+                await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
     else:
-        await message.answer("Invalid referral code. The code should contain only Latin letters and Arabic numerals.")
+        await message.reply("Invalid referral code. The code should contain only Latin letters and Arabic numerals.")
 
 
 # Handler for /povo_del command
@@ -54,13 +58,13 @@ async def send_referral_code(message: types.Message):
         # Select a random code
         code = choice(codes)
         if code[2] < 10:  # Check if code usage is less than 10
-            await message.answer(f"Here's your referral code: {code[1]}")
+            await message.reply(f"Here's your referral code: {code[1]}")
             increment_code_usage(code[0])
         else:
             delete_code(code[0])
             return await send_referral_code(message)
     else:
-        await message.answer("No referral codes available at the moment.")
+        await message.reply("No referral codes available at the moment.")
 
 
 # Start polling
