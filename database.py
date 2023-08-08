@@ -1,5 +1,6 @@
 import sqlite3
 from config import DB_NAME
+from datetime import datetime, timedelta
 
 # Initialize SQLite database
 conn = sqlite3.connect(DB_NAME)
@@ -12,6 +13,17 @@ cursor.execute('''
         code TEXT NOT NULL,
         usage_count INTEGER DEFAULT 0
     )
+''')
+conn.commit()
+
+cursor.execute('''
+    CREATE TABLE user_activity (
+        id INTEGER PRIMARY KEY,
+        user_id INTEGER NOT NULL,
+        action TEXT NOT NULL,
+        referral_code TEXT,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
 ''')
 conn.commit()
 
@@ -39,3 +51,36 @@ def increment_code_usage(id: int):
 def code_exists(code: str):
     cursor.execute('SELECT * FROM codes WHERE code = ?', (code,))
     return cursor.fetchone() is not None
+
+
+def log_user_activity(user_id, action, referral_code=None):
+    """Logs the user's activity in the database."""
+    cursor.execute(
+        'INSERT INTO user_activity (user_id, action, referral_code) VALUES (?, ?, ?)',
+        (user_id, action, referral_code)
+    )
+    conn.commit()
+
+
+def can_add_code(user_id, referral_code):
+    """Checks if the user can add the given referral code."""
+    # Check if the user has already added this referral code
+    cursor.execute(
+        'SELECT * FROM user_activity WHERE user_id = ? AND action = "add" AND referral_code = ?',
+        (user_id, referral_code)
+    )
+    if cursor.fetchone():
+        return False
+    return True
+
+
+def can_get_code(user_id):
+    """Checks if the user can retrieve a referral code."""
+    one_hour_ago = datetime.now() - timedelta(hours=1)
+    cursor.execute(
+        'SELECT * FROM user_activity WHERE user_id = ? AND action = "get" AND timestamp > ?',
+        (user_id, one_hour_ago)
+    )
+    if cursor.fetchone():
+        return False
+    return True
