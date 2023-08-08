@@ -26,6 +26,6 @@ INVALID_OR_DUPLICATE_CODE = "Реферальный код недействит�
 
 # Inline Keyboard Buttons (keeping these the same as they contain universal symbols)
 USED_BUTTON_TEXT = "Я использовал(а) код ✅"
-CONFIRM_BUTTON_TEXT = "Да, я осознаю, что код будет безвозвратно удалён ✅"
-CANCEL_BUTTON_TEXT = "Нет, я случайно ❌"
+CONFIRM_BUTTON_TEXT = "Да ✅"
+CANCEL_BUTTON_TEXT = "Нет ❌"
 
