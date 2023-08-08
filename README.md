@@ -18,7 +18,7 @@ To set up and run the bot, follow these steps:
 1. Clone this repository:
 
 ```
-git clone https://gitlab.com/ihavepixelxd/povo_referral.git
+git clone https://github.com/ProcrastinatorMuffin/PovoRefBot
 ```
 
 2. Install the requirements:
