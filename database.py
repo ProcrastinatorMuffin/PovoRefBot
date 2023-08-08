@@ -219,3 +219,37 @@ def can_get_code(user_id: int) -> bool:
         logger.error(f"Error checking if user (UserID {user_id}) can get a referral code: {e}")
         return False
 
+
+def fetch_referral_code_by_id(code_id: int) -> str:
+    """
+    Fetch a referral code from the database using its ID.
+
+    Args:
+        code_id (int): The unique identifier of the referral code to be fetched.
+
+    Returns:
+        str: The referral code corresponding to the given ID.
+
+    Raises:
+        ValueError: If no referral code is found for the given ID.
+    """
+
+    # Log the start of the operation
+    logger.info(f"Fetching referral code for ID {code_id} from the database.")
+
+    try:
+        cursor.execute('SELECT code FROM codes WHERE id = ?', (code_id,))
+        code = cursor.fetchone()
+
+        # If a code is found for the given ID, return it
+        if code:
+            logger.info(f"Successfully fetched referral code {code[0]} for ID {code_id}.")
+            return code[0]
+        else:
+            # If no code is found, log an error and raise an exception
+            logger.error(f"No referral code found for ID {code_id}.")
+            raise ValueError(f"No referral code found for ID {code_id}.")
+    except sqlite3.Error as e:
+        # Log any SQLite error and re-raise it
+        logger.error(f"Database error while fetching referral code for ID {code_id}: {e}")
+        raise

@@ -19,7 +19,7 @@ from config import (
 )
 from database import (
     add_code, get_codes, delete_code, increment_code_usage, code_exists, can_get_code,
-    log_user_activity, can_add_code
+    log_user_activity, can_add_code, fetch_referral_code_by_id
 )
 
 # Constants
@@ -270,18 +270,33 @@ async def confirm_usage(callback_query: types.CallbackQuery):
 async def cancel_usage(callback_query: types.CallbackQuery):
     """
     Handler function for callback queries that start with "confirmNo".
-    This function answers the callback query with a cancellation message.
+    This function answers the callback query with a cancellation message and
+    restores the message to its original state.
 
     Args:
         callback_query (types.CallbackQuery): The incoming callback query object from the user.
     """
 
-    # Log the receipt of the callback query indicating the user's decision to cancel
-    logger.info(f"Received confirmNo callback from user {callback_query.from_user.id}. Action is cancelled.")
+    # Extract the code_id from the callback data
+    _, code_id = callback_query.data.split('_')
 
-    # Answer the callback query, notifying the user of the cancellation
-    await bot.answer_callback_query(callback_query.id, text=ACTION_CANCELLED)
-    logger.info(f"Answered callback query for user {callback_query.from_user.id} with cancellation message.")
+    # Fetch the referral code associated with the given code_id
+    referral_code = fetch_referral_code_by_id(code_id)
+
+    # Define the inline keyboard with the "USED" button
+    keyboard = types.InlineKeyboardMarkup()
+    keyboard.add(
+        types.InlineKeyboardButton(text=USED_BUTTON_TEXT, callback_data=f"confirmUsage_{code_id}_{callback_query.from_user.id}")
+    )
+
+    # Edit the message to restore it to its initial state
+    await bot.edit_message_text(chat_id=callback_query.message.chat.id,
+                                message_id=callback_query.message.message_id,
+                                text=REFERRAL_CODE_MSG.format(referral_code),
+                                reply_markup=keyboard)
+
+    # Log the restoration of the message to its original state
+    logger.info(f"Restored original message for user {callback_query.from_user.id} after cancellation.")
 
 
 async def schedule_message_deletion(chat_id: int, message_id: int, delay: int):
